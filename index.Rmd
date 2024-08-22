@@ -1,0 +1,104 @@
+---
+title: "Generalized Dissimilarity Modeling for Evolutionary Divergence and Historical Connectivity Analysis"
+author: "Sebastián Sánchez Cuartas"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+      position: "left"
+    theme: flatly
+    highlight: tango
+---
+
+# **Introduction**
+
+To evaluate the relationship between evolutionary distance and connectivity, we use a GDM analysis with the "gdm" package v.1.5.0-9.1 in RStudio. Following the package's manual recommendations, evolutionary distance data were rescaled using the min-max normalization method due to their proximity to zero, which could affect the model's sensitivity in its original scale. The explanatory variables include the geographic coordinates of each site or organism (used as geographic distance) and historical connectivity indices between pairs (CMP-Dist, CMP-DistM, and CMP-CF). Since GDM does not allow direct inclusion of distances as explanatory variables, Non-Metric Multidimensional Scaling (NMDS) was applied for each lineage pair according to each index. The "vegan" package in RStudio was used to perform NMDS, resulting in a low-dimensional space that preserved the similarity or dissimilarity relationships among the samples corresponding to these indices. The NMDS1 and NMDS2 coordinates of each lineage were then used as explanatory variables.
+
+To determine the contribution of connectivity metrics in explaining variation in evolutionary distances, several models were proposed in the original study, and we selected the one that maximized the explained deviance. Four groups of GDM models were proposed: (1) Evolutionary Distance (ED) \~ Geographic Distance (GD); (2) ED \~ GD + CMP-Dist; (3) ED \~ GD + CMP-DistM; and (4) ED \~ GD + CMP-CF. The explained deviance quantifies the proportion of variability in the response variable that can be attributed to the predictors included in the model. These data were processed using the "gdm.varImp" function from the "gdm" package, with 1,000 permutations and a p-value of 0.05. This function uses matrix permutation to perform significance tests on models and predictors, and to estimate the importance of predictors in a GDM.
+
+## **NMDS**
+
+```{r eval=FALSE}
+
+library(vegan)
+
+#### Aplicación del NMDS. Aqui se lee de forma individual cada una de las matrices de distancias de los indices de conectividad historica
+
+matriz_distmp <- read.csv("C:/Users/Usuario/Desktop/Archivos_tesis/Resultados_matrices_indices/CF_beta0_graph1_Clado_L.csv", row.names = 1)
+
+# Realizar análisis NMDS
+nmds_resultado <- metaMDS(matriz_distmp)
+nmds_df <- as.data.frame(nmds_resultado$points)
+
+# ruta donde deseas guardar el archivo CSV
+ruta_archivo <- "C:/Users/Usuario/Desktop/Archivos_tesis/GDM/pseudocoordenadas1/pseudocoordenadas_CF_beta0_graph1_Clado_L.csv"
+
+# Escribir el dataframe en un archivo CSV
+write.csv(nmds_df, file = ruta_archivo, row.names = TRUE)
+
+```
+
+## **Formatting evolutionary distances**
+
+```{r eval=FALSE}
+
+# Cargar los datos de distancias evolutivas
+matriz_tiempos <- read.csv("C:/Users/Usuario/Desktop/Archivos_tesis/Distancias_evolutivas/Distancias_evolutivas_CF_Clado_C_R_T - gdm.csv", row.names = 1)
+
+# Escalar los datos de distancias evolutivas a valores entre 0 y 1
+scaled_data <- matriz_tiempos - min(matriz_tiempos)
+scaled_data <- scaled_data / max(scaled_data)
+scaled_data_decimal <- as.data.frame(scaled_data)
+
+# Cambiar los nombres de las columnas a V1, V2, V3, ... (Hace parte del formateo que lee el paquete gdm)
+colnames(scaled_data_decimal) <- paste0("V", seq_len(ncol(scaled_data_decimal)))
+
+# Cambiar los nombres de las filas a 1, 2, 3, ... (Hace parte del formateo que lee el paquete gdm)
+rownames(scaled_data_decimal) <- seq_len(nrow(scaled_data_decimal))
+```
+
+## **Formatting NMDS**
+
+```{r eval=FALSE}
+
+# Cargar los datos de NMDS (o usar directamente el vector del NMDS anterior)
+nmds <- read.csv("C:/Users/Usuario/Desktop/Archivos_tesis/GDM/GDM_C_R_T.csv")
+
+# Crear la columna 'site' con una secuencia de números que corresponda al número de filas (Es parte clave este encabezado  y la enumeración dentro del formateado del GDM)
+nmds_df$site <- seq(1, nrow(nmds_df))
+
+# Mover la columna 'site' a la primera posición
+nmds_df <- nmds_df[, c("site", "MDS1", "MDS2")]
+
+```
+
+## **Formatting Data for GDM**
+
+Once the NMDS and Evolutionary Distances are correctly formatted, the data is then prepared for the GDM using the `formatsitepair` function.
+
+```{r eval=FALSE}
+
+gdmTab.dis <- formatsitepair(bioData = scaled_data_decimal,
+                             bioFormat = 3, # Formato de matriz de distancias
+                             XColumn = "Long", # Nombre de la columna de coordenadas X
+                             YColumn = "Lat", # Nombre de la columna de coordenadas Y
+                             predData = pseudocoordenadas, # Datos de predicción (coordenadas)
+                             siteColumn = "site") # Columna de identificadores de sitio
+
+#GDM model fitting
+gdm.1 <- gdm(data=gdmTab.dis,
+             geo=TRUE)
+
+summary(gdm.1)
+
+#Función gdm.VarImp
+
+gdm.varImp(gdmTab.dis, geo=TRUE, splines = NULL, knots = NULL,
+           predSelect = FALSE, nPerm = 1000, pValue=0.05, parallel = FALSE, cores = 3,
+           sampleSites = 1, sampleSitePairs = 1, outFile = NULL)
+
+```
