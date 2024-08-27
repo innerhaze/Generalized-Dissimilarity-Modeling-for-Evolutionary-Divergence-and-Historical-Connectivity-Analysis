@@ -430,13 +430,13 @@ div.tocify {
 <h1 class="title toc-ignore">Generalized Dissimilarity Modeling for
 Evolutionary Divergence and Historical Connectivity Analysis</h1>
 <h4 class="author">Sebastián Sánchez Cuartas</h4>
-<h4 class="date">agosto 22, 2024</h4>
 
 </div>
 
 
-<div id="introduction" class="section level1">
-<h1><strong>Introduction</strong></h1>
+<hr />
+<div id="introduction" class="section level2">
+<h2><strong>1. Introduction</strong></h2>
 <p>To evaluate the relationship between evolutionary distance and
 connectivity, we use a GDM analysis with the “gdm” package v.1.5.0-9.1
 in RStudio. Following the package’s manual recommendations, evolutionary
@@ -465,8 +465,10 @@ were processed using the “gdm.varImp” function from the “gdm” package,
 with 1,000 permutations and a p-value of 0.05. This function uses matrix
 permutation to perform significance tests on models and predictors, and
 to estimate the importance of predictors in a GDM.</p>
+<hr />
+</div>
 <div id="nmds" class="section level2">
-<h2><strong>NMDS</strong></h2>
+<h2><strong>2. NMDS</strong></h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vegan)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="do">#### Aplicación del NMDS. Aqui se lee de forma individual cada una de las matrices de distancias de los indices de conectividad historica</span></span>
@@ -482,9 +484,10 @@ to estimate the importance of predictors in a GDM.</p>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Escribir el dataframe en un archivo CSV</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(nmds_df, <span class="at">file =</span> ruta_archivo, <span class="at">row.names =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<hr />
 </div>
 <div id="formatting-evolutionary-distances" class="section level2">
-<h2><strong>Formatting evolutionary distances</strong></h2>
+<h2><strong>3. Formatting evolutionary distances</strong></h2>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar los datos de distancias evolutivas</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>matriz_tiempos <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;C:/Users/Usuario/Desktop/Archivos_tesis/Distancias_evolutivas/Distancias_evolutivas_CF_Clado_C_R_T - gdm.csv&quot;</span>, <span class="at">row.names =</span> <span class="dv">1</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -498,9 +501,10 @@ to estimate the importance of predictors in a GDM.</p>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Cambiar los nombres de las filas a 1, 2, 3, ... (Hace parte del formateo que lee el paquete gdm)</span></span>
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(scaled_data_decimal) <span class="ot">&lt;-</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(scaled_data_decimal))</span></code></pre></div>
+<hr />
 </div>
 <div id="formatting-nmds" class="section level2">
-<h2><strong>Formatting NMDS</strong></h2>
+<h2><strong>4. Formatting NMDS</strong></h2>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar los datos de NMDS (o usar directamente el vector del NMDS anterior)</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>nmds <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;C:/Users/Usuario/Desktop/Archivos_tesis/GDM/GDM_C_R_T.csv&quot;</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -509,9 +513,10 @@ to estimate the importance of predictors in a GDM.</p>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Mover la columna &#39;site&#39; a la primera posición</span></span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>nmds_df <span class="ot">&lt;-</span> nmds_df[, <span class="fu">c</span>(<span class="st">&quot;site&quot;</span>, <span class="st">&quot;MDS1&quot;</span>, <span class="st">&quot;MDS2&quot;</span>)]</span></code></pre></div>
+<hr />
 </div>
 <div id="formatting-data-for-gdm" class="section level2">
-<h2><strong>Formatting Data for GDM</strong></h2>
+<h2><strong>5. Formatting Data for GDM</strong></h2>
 <p>Once the NMDS and Evolutionary Distances are correctly formatted, the
 data is then prepared for the GDM using the <code>formatsitepair</code>
 function.</p>
@@ -533,7 +538,6 @@ function.</p>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="fu">gdm.varImp</span>(gdmTab.dis, <span class="at">geo=</span><span class="cn">TRUE</span>, <span class="at">splines =</span> <span class="cn">NULL</span>, <span class="at">knots =</span> <span class="cn">NULL</span>,</span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">predSelect =</span> <span class="cn">FALSE</span>, <span class="at">nPerm =</span> <span class="dv">1000</span>, <span class="at">pValue=</span><span class="fl">0.05</span>, <span class="at">parallel =</span> <span class="cn">FALSE</span>, <span class="at">cores =</span> <span class="dv">3</span>,</span>
 <span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">sampleSites =</span> <span class="dv">1</span>, <span class="at">sampleSitePairs =</span> <span class="dv">1</span>, <span class="at">outFile =</span> <span class="cn">NULL</span>)</span></code></pre></div>
-</div>
 </div>
 
 
